@@ -15,8 +15,7 @@ services:
       retries: 10
 
   api:
-    build:
-      context: ./backend
+    image: jacksonbond11/space-economy-api:latest
     restart: unless-stopped
     ports:
       - "5038:8080"
