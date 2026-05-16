@@ -184,6 +184,7 @@ html, body {
 .marker:hover { transform: translate(-50%, -50%) scale(1.08); z-index: 8; }
 .marker.dim { opacity: 0.18; pointer-events: none; }
 .marker.selected { z-index: 9; }
+.marker.dragging { z-index: 10; transform: translate(-50%, -50%) scale(1.12); filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5)); }
 .marker.selected .marker-card {
   border-color: var(--accent);
   background: rgba(125,211,252,0.18);

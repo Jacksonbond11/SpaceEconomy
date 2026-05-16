@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { ZONES, SECTORS, SECTOR_COLORS } from "./constants";
 import { api } from "./api";
 import { useTweaks } from "./hooks/useTweaks";
@@ -60,6 +60,7 @@ function repulsePositions(companies, w, h, zones) {
 
 const TWEAK_DEFAULTS = { labelsAlwaysOn: false, showZoneLines: true };
 const QUOTE_POLL_MS = 5 * 60 * 1000;
+const LS_KEY = "se-node-positions";
 
 export function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
@@ -72,6 +73,15 @@ export function App() {
   const [activeSectors, setActiveSectors] = useState(new Set());
   const [search, setSearch] = useState("");
   const [showResults, setShowResults] = useState(false);
+
+  const sceneRef = useRef(null);
+  const draggingRef = useRef(null);
+  const suppressClickRef = useRef(false);
+  const [activeDrag, setActiveDrag] = useState(null);
+  const [dragPositions, setDragPositions] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) ?? "{}"); }
+    catch { return {}; }
+  });
 
   useEffect(() => {
     api.companies().then((data) => {
@@ -125,25 +135,90 @@ export function App() {
   const dynamicZones = useMemo(() => computeDynamicZones(companies), [companies]);
   const resolvedPositions = useMemo(() => repulsePositions(companies, w, h, dynamicZones), [companies, w, h, dynamicZones]);
 
+  const finalPositions = useMemo(() => Object.fromEntries(
+    companies.map((c) => [c.ticker, dragPositions[c.ticker] ?? resolvedPositions[c.ticker] ?? { x: c.x * 100, y: companyY(c, dynamicZones) }])
+  ), [companies, resolvedPositions, dragPositions, dynamicZones]);
+
+  const startDrag = useCallback((company, e) => {
+    e.preventDefault();
+    const scene = sceneRef.current.getBoundingClientRect();
+    const pos = finalPositions[company.ticker];
+    draggingRef.current = {
+      ticker: company.ticker,
+      origX: pos.x,
+      origY: pos.y,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+      sceneW: scene.width,
+      sceneH: scene.height,
+      moved: false,
+    };
+    setActiveDrag(company.ticker);
+  }, [finalPositions]);
+
+  const onScenePointerMove = useCallback((e) => {
+    if (!draggingRef.current) return;
+    const d = draggingRef.current;
+    const dx = e.clientX - d.startClientX;
+    const dy = e.clientY - d.startClientY;
+    if (Math.sqrt(dx * dx + dy * dy) > 4) d.moved = true;
+    if (!d.moved) return;
+    const newX = Math.max(1, Math.min(99, d.origX + dx / d.sceneW * 100));
+    const newY = Math.max(1, Math.min(99, d.origY + dy / d.sceneH * 100));
+    setDragPositions((prev) => ({ ...prev, [d.ticker]: { x: newX, y: newY } }));
+  }, []);
+
+  const onScenePointerUp = useCallback(() => {
+    if (!draggingRef.current) return;
+    const d = draggingRef.current;
+    if (d.moved) {
+      suppressClickRef.current = true;
+      setDragPositions((prev) => {
+        localStorage.setItem(LS_KEY, JSON.stringify(prev));
+        return prev;
+      });
+    }
+    draggingRef.current = null;
+    setActiveDrag(null);
+  }, []);
+
+  const onSceneClick = useCallback(() => {
+    if (suppressClickRef.current) { suppressClickRef.current = false; return; }
+    setSelected(null);
+  }, []);
+
   const hoverQuote = hover ? quotes[hover.ticker] : null;
   const selectedQuote = selected ? quotes[selected.ticker] : null;
 
   return (
     <>
-      <div className="scene" onClick={() => setSelected(null)}>
+      <div
+        className="scene"
+        ref={sceneRef}
+        onClick={onSceneClick}
+        onPointerMove={onScenePointerMove}
+        onPointerUp={onScenePointerUp}
+        onPointerLeave={onScenePointerUp}
+      >
         <ZoneLines show={t.showZoneLines} zones={dynamicZones} />
         {companies.map((c) => {
-          const pos = resolvedPositions[c.ticker];
+          const pos = finalPositions[c.ticker];
           return (
             <Marker
               key={c.ticker}
               company={c}
               posX={pos?.x}
               posY={pos?.y}
+              isDragging={activeDrag === c.ticker}
               selected={selected?.ticker === c.ticker}
               dimmed={!visibleSet.has(c.ticker)}
               showLabel={t.labelsAlwaysOn}
-              onClick={(c) => { setSelected(c); setHover(null); }}
+              onDragStart={startDrag}
+              onClick={(c) => {
+                if (suppressClickRef.current) { suppressClickRef.current = false; return; }
+                setSelected(c);
+                setHover(null);
+              }}
               onHover={onMarkerHover}
               onLeave={() => setHover(null)}
             />

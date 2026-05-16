@@ -14,14 +14,15 @@ export function companyY(c, zones = ZONES) {
   return (z.yPct + jitter + (c.yOffset ?? 0)) * 100;
 }
 
-export function Marker({ company, posX, posY, selected, dimmed, showLabel, onClick, onHover, onLeave }) {
+export function Marker({ company, posX, posY, isDragging, selected, dimmed, showLabel, onDragStart, onClick, onHover, onLeave }) {
   const color = SECTOR_COLORS[company.sectors[0]] ?? "#7dd3fc";
   const left = posX ?? company.x * 100;
   const top = posY ?? companyY(company);
   return (
     <div
-      className={`marker ${selected ? "selected" : ""} ${dimmed ? "dim" : ""} ${showLabel ? "show-label" : ""}`}
-      style={{ left: `${left}%`, top: `${top}%` }}
+      className={`marker ${selected ? "selected" : ""} ${dimmed ? "dim" : ""} ${showLabel ? "show-label" : ""} ${isDragging ? "dragging" : ""}`}
+      style={{ left: `${left}%`, top: `${top}%`, cursor: isDragging ? "grabbing" : "grab", touchAction: "none" }}
+      onPointerDown={(e) => onDragStart(company, e)}
       onClick={(e) => { e.stopPropagation(); onClick(company); }}
       onMouseEnter={(e) => onHover(company, e)}
       onMouseLeave={onLeave}
