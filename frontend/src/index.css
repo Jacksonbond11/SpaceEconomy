@@ -320,7 +320,7 @@ html, body {
 
 @media (max-width: 768px) {
   html, body { overflow-y: auto; height: auto; }
-  .scene { position: relative; min-height: 200vh; overflow: visible; }
+  .scene { position: relative; min-height: 150vh; overflow: visible; }
 
   .topbar {
     position: fixed;

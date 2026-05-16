@@ -12,7 +12,7 @@ const MOBILE_BP = 768;
 function useSceneSize() {
   const get = () => ({
     w: window.innerWidth,
-    h: window.innerWidth <= MOBILE_BP ? window.innerHeight * 2 : window.innerHeight,
+    h: window.innerWidth <= MOBILE_BP ? window.innerHeight * 1.5 : window.innerHeight,
   });
   const [size, setSize] = useState(get);
   useEffect(() => {
