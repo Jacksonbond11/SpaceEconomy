@@ -1,8 +1,8 @@
-using Massive.Api.Data;
-using Massive.Api.Models;
+using SpaceEconomy.Api.Data;
+using SpaceEconomy.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Massive.Api.Services;
+namespace SpaceEconomy.Api.Services;
 
 public class MarketDataRefreshService(
     IServiceScopeFactory scopeFactory,

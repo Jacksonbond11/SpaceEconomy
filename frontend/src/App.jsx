@@ -97,7 +97,7 @@ export function App() {
           <div className="brand">
             <div className="brand-mark" />
             <div>
-              <div className="brand-title">Massive</div>
+              <div className="brand-title">Space Economy</div>
               <div className="brand-sub mono">Space Markets · Orbital Map</div>
             </div>
           </div>

@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 
-namespace Massive.Api.Services;
+namespace SpaceEconomy.Api.Services;
 
 public class PolygonService(HttpClient http, IConfiguration config)
 {

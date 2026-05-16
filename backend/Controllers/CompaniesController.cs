@@ -1,9 +1,9 @@
-using Massive.Api.Data;
-using Massive.Api.Models;
+using SpaceEconomy.Api.Data;
+using SpaceEconomy.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Massive.Api.Controllers;
+namespace SpaceEconomy.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

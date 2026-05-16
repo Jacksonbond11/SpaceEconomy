@@ -1,4 +1,4 @@
-namespace Massive.Api.Models;
+namespace SpaceEconomy.Api.Models;
 
 public class NewsArticle
 {

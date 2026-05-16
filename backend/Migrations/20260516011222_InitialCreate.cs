@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Massive.Api.Migrations
+namespace SpaceEconomy.Api.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

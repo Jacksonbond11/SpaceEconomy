@@ -1,5 +1,5 @@
-using Massive.Api.Data;
-using Massive.Api.Services;
+using SpaceEconomy.Api.Data;
+using SpaceEconomy.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
