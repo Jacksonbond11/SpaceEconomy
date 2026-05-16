@@ -272,7 +272,7 @@ export function App() {
             )}
           </div>
 
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 14 }}>
+          <div className="topbar-meta" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 14 }}>
             {Object.keys(dragPositions).length > 0 && (
               <button
                 onClick={() => { setDragPositions({}); localStorage.removeItem(LS_KEY); }}
