@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { SECTORS, SECTOR_COLORS } from "./constants";
+import { ZONES, SECTORS, SECTOR_COLORS } from "./constants";
 import { api } from "./api";
 import { useTweaks } from "./hooks/useTweaks";
 import { Marker, companyY } from "./components/Marker";
@@ -17,10 +17,26 @@ function useWindowSize() {
   return size;
 }
 
-function repulsePositions(companies, w, h) {
+function computeDynamicZones(companies) {
+  const counts = Object.fromEntries(ZONES.map((z) => [z.id, 0]));
+  companies.forEach((c) => { if (c.zone in counts) counts[c.zone]++; });
+  const weights = ZONES.map((z) => Math.max(counts[z.id], 1));
+  const total = weights.reduce((a, b) => a + b, 0);
+  const TOP = 0.18, BOTTOM = 0.06;
+  const available = 1 - TOP - BOTTOM;
+  let cursor = TOP;
+  return ZONES.map((z, i) => {
+    const bandH = available * weights[i] / total;
+    const yPct = cursor + bandH / 2;
+    cursor += bandH;
+    return { ...z, yPct };
+  });
+}
+
+function repulsePositions(companies, w, h, zones) {
   if (!companies.length) return {};
   const MIN_PX = 68;
-  const pts = companies.map((c) => ({ ticker: c.ticker, x: c.x * w, y: companyY(c) / 100 * h }));
+  const pts = companies.map((c) => ({ ticker: c.ticker, x: c.x * w, y: companyY(c, zones) / 100 * h }));
   for (let iter = 0; iter < 30; iter++) {
     for (let i = 0; i < pts.length; i++) {
       for (let j = i + 1; j < pts.length; j++) {
@@ -106,7 +122,8 @@ export function App() {
     });
   }, []);
 
-  const resolvedPositions = useMemo(() => repulsePositions(companies, w, h), [companies, w, h]);
+  const dynamicZones = useMemo(() => computeDynamicZones(companies), [companies]);
+  const resolvedPositions = useMemo(() => repulsePositions(companies, w, h, dynamicZones), [companies, w, h, dynamicZones]);
 
   const hoverQuote = hover ? quotes[hover.ticker] : null;
   const selectedQuote = selected ? quotes[selected.ticker] : null;
@@ -114,7 +131,7 @@ export function App() {
   return (
     <>
       <div className="scene" onClick={() => setSelected(null)}>
-        <ZoneLines show={t.showZoneLines} />
+        <ZoneLines show={t.showZoneLines} zones={dynamicZones} />
         {companies.map((c) => {
           const pos = resolvedPositions[c.ticker];
           return (

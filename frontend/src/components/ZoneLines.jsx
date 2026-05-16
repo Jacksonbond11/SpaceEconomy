@@ -1,9 +1,9 @@
 import { ZONES } from "../constants";
 
-export function ZoneLines({ show }) {
+export function ZoneLines({ show, zones = ZONES }) {
   return (
     <div className="scale">
-      {ZONES.map((z, i) => (
+      {zones.map((z, i) => (
         <div
           key={z.id}
           className="zone-line"

@@ -7,8 +7,8 @@ function hashFloat(s, salt = 0) {
   return ((h >>> 0) % 10000) / 10000;
 }
 
-export function companyY(c) {
-  const z = ZONES.find((z) => z.id === c.zone);
+export function companyY(c, zones = ZONES) {
+  const z = zones.find((z) => z.id === c.zone);
   if (!z) return 50;
   const jitter = (hashFloat(c.ticker, 7) - 0.5) * 0.1;
   return (z.yPct + jitter + (c.yOffset ?? 0)) * 100;
