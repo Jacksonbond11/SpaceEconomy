@@ -2,16 +2,52 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { SECTORS, SECTOR_COLORS } from "./constants";
 import { api } from "./api";
 import { useTweaks } from "./hooks/useTweaks";
-import { Marker } from "./components/Marker";
+import { Marker, companyY } from "./components/Marker";
 import { Tooltip } from "./components/Tooltip";
 import { DetailPanel } from "./components/DetailPanel";
 import { ZoneLines } from "./components/ZoneLines";
+
+function useWindowSize() {
+  const [size, setSize] = useState({ w: window.innerWidth, h: window.innerHeight });
+  useEffect(() => {
+    const onResize = () => setSize({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return size;
+}
+
+function repulsePositions(companies, w, h) {
+  if (!companies.length) return {};
+  const MIN_PX = 68;
+  const pts = companies.map((c) => ({ ticker: c.ticker, x: c.x * w, y: companyY(c) / 100 * h }));
+  for (let iter = 0; iter < 30; iter++) {
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        const a = pts[i], b = pts[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MIN_PX && dist > 0.001) {
+          const push = (MIN_PX - dist) / 2;
+          const nx = dx / dist, ny = dy / dist;
+          a.x += nx * push; b.x -= nx * push;
+          a.y += ny * push; b.y -= ny * push;
+        }
+      }
+    }
+  }
+  return Object.fromEntries(pts.map((p) => [p.ticker, {
+    x: Math.max(1, Math.min(99, p.x / w * 100)),
+    y: Math.max(1, Math.min(99, p.y / h * 100)),
+  }]));
+}
 
 const TWEAK_DEFAULTS = { labelsAlwaysOn: false, showZoneLines: true };
 const QUOTE_POLL_MS = 5 * 60 * 1000;
 
 export function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const { w, h } = useWindowSize();
   const [companies, setCompanies] = useState([]);
   const [quotes, setQuotes] = useState({});
   const [selected, setSelected] = useState(null);
@@ -70,6 +106,8 @@ export function App() {
     });
   }, []);
 
+  const resolvedPositions = useMemo(() => repulsePositions(companies, w, h), [companies, w, h]);
+
   const hoverQuote = hover ? quotes[hover.ticker] : null;
   const selectedQuote = selected ? quotes[selected.ticker] : null;
 
@@ -77,18 +115,23 @@ export function App() {
     <>
       <div className="scene" onClick={() => setSelected(null)}>
         <ZoneLines show={t.showZoneLines} />
-        {companies.map((c) => (
-          <Marker
-            key={c.ticker}
-            company={c}
-            selected={selected?.ticker === c.ticker}
-            dimmed={!visibleSet.has(c.ticker)}
-            showLabel={t.labelsAlwaysOn}
-            onClick={(c) => { setSelected(c); setHover(null); }}
-            onHover={onMarkerHover}
-            onLeave={() => setHover(null)}
-          />
-        ))}
+        {companies.map((c) => {
+          const pos = resolvedPositions[c.ticker];
+          return (
+            <Marker
+              key={c.ticker}
+              company={c}
+              posX={pos?.x}
+              posY={pos?.y}
+              selected={selected?.ticker === c.ticker}
+              dimmed={!visibleSet.has(c.ticker)}
+              showLabel={t.labelsAlwaysOn}
+              onClick={(c) => { setSelected(c); setHover(null); }}
+              onHover={onMarkerHover}
+              onLeave={() => setHover(null)}
+            />
+          );
+        })}
         <Tooltip company={hover} quote={hoverQuote} x={mousePos.x} y={mousePos.y} />
       </div>
 
