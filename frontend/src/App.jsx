@@ -267,10 +267,20 @@ export function App() {
             )}
           </div>
 
-          <div style={{ marginLeft: "auto", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--ink-dim)", letterSpacing: ".14em", textTransform: "uppercase" }}>
-            <span style={{ color: "var(--ink)" }}>{visibleSet.size}</span>
-            <span style={{ color: "var(--ink-faint)" }}> / {companies.length} </span>
-            <span style={{ color: "var(--ink-faint)", fontSize: 10 }}>tracked</span>
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 14 }}>
+            {Object.keys(dragPositions).length > 0 && (
+              <button
+                onClick={() => { setDragPositions({}); localStorage.removeItem(LS_KEY); }}
+                style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: "var(--ink-faint)", letterSpacing: ".12em", textTransform: "uppercase", padding: 0 }}
+              >
+                Reset layout
+              </button>
+            )}
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--ink-dim)", letterSpacing: ".14em", textTransform: "uppercase" }}>
+              <span style={{ color: "var(--ink)" }}>{visibleSet.size}</span>
+              <span style={{ color: "var(--ink-faint)" }}> / {companies.length} </span>
+              <span style={{ color: "var(--ink-faint)", fontSize: 10 }}>tracked</span>
+            </div>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ZONES, SECTOR_COLORS } from "../constants";
 import { api } from "../api";
 
@@ -34,6 +34,8 @@ export function DetailPanel({ company, quote, onClose }) {
   const [shown, setShown] = useState(null);
   const [news, setNews] = useState([]);
   const [newsLoading, setNewsLoading] = useState(false);
+  const panelRef = useRef(null);
+  const swipeRef = useRef(null);
 
   useEffect(() => {
     if (company) {
@@ -50,6 +52,32 @@ export function DetailPanel({ company, quote, onClose }) {
     }
   }, [company]);
 
+  function onHandlePointerDown(e) {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    swipeRef.current = { startX: e.clientX, startY: e.clientY };
+  }
+
+  function onHandlePointerMove(e) {
+    if (!swipeRef.current || !panelRef.current) return;
+    const dx = Math.max(0, e.clientX - swipeRef.current.startX);
+    const dy = Math.max(0, e.clientY - swipeRef.current.startY);
+    panelRef.current.style.transform = `translateX(${dx}px) translateY(${dy * 0.25}px)`;
+    panelRef.current.style.transition = "none";
+  }
+
+  function onHandlePointerUp(e) {
+    if (!swipeRef.current) return;
+    const dx = e.clientX - swipeRef.current.startX;
+    const dy = e.clientY - swipeRef.current.startY;
+    swipeRef.current = null;
+    if (panelRef.current) {
+      panelRef.current.style.transform = "";
+      panelRef.current.style.transition = "";
+    }
+    if (dx > 80 || dy > 100) onClose();
+  }
+
   const c = shown;
   const open = !!company;
   const maxKm = 400000;
@@ -60,9 +88,16 @@ export function DetailPanel({ company, quote, onClose }) {
   const change = fmtChange(quote?.changePct);
 
   return (
-    <aside className={`panel ${open ? "open" : ""}`} aria-hidden={!open}>
+    <aside ref={panelRef} className={`panel ${open ? "open" : ""}`} aria-hidden={!open}>
       {c && (
         <>
+          <div
+            className="panel-handle"
+            onPointerDown={onHandlePointerDown}
+            onPointerMove={onHandlePointerMove}
+            onPointerUp={onHandlePointerUp}
+          />
+
           <button className="panel-close" onClick={onClose} aria-label="Close">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M2 2 L12 12 M12 2 L2 12" />

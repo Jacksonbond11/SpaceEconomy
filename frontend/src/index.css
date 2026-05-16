@@ -260,6 +260,13 @@ html, body {
 .panel.open > *:nth-child(8) { transition-delay: 0.34s; }
 .panel.open > *:nth-child(9) { transition-delay: 0.38s; }
 
+.panel-handle {
+  width: 40px; height: 4px; border-radius: 2px;
+  background: var(--line-strong);
+  margin: 0 auto 20px;
+  cursor: grab; touch-action: none;
+}
+.panel-handle:active { cursor: grabbing; }
 .panel-close {
   position: absolute; top: 18px; right: 18px;
   background: transparent; border: 1px solid var(--line-strong);
