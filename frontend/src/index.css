@@ -317,3 +317,10 @@ html, body {
 
 @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 .twinkle { animation: twinkle 4s ease-in-out infinite; }
+
+@media (max-width: 768px) {
+  html, body { overflow-y: auto; height: auto; }
+  .scene { position: relative; min-height: 200vh; overflow: visible; }
+  .topbar { position: fixed; }
+  .panel { width: 100%; border-left: none; border-top: 1px solid var(--line-strong); top: auto; }
+}

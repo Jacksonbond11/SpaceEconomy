@@ -7,10 +7,16 @@ import { Tooltip } from "./components/Tooltip";
 import { DetailPanel } from "./components/DetailPanel";
 import { ZoneLines } from "./components/ZoneLines";
 
-function useWindowSize() {
-  const [size, setSize] = useState({ w: window.innerWidth, h: window.innerHeight });
+const MOBILE_BP = 768;
+
+function useSceneSize() {
+  const get = () => ({
+    w: window.innerWidth,
+    h: window.innerWidth <= MOBILE_BP ? window.innerHeight * 2 : window.innerHeight,
+  });
+  const [size, setSize] = useState(get);
   useEffect(() => {
-    const onResize = () => setSize({ w: window.innerWidth, h: window.innerHeight });
+    const onResize = () => setSize(get());
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
@@ -64,7 +70,7 @@ const LS_KEY = "se-node-positions";
 
 export function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
-  const { w, h } = useWindowSize();
+  const { w, h } = useSceneSize();
   const [companies, setCompanies] = useState([]);
   const [quotes, setQuotes] = useState({});
   const [selected, setSelected] = useState(null);
@@ -198,7 +204,6 @@ export function App() {
         onClick={onSceneClick}
         onPointerMove={onScenePointerMove}
         onPointerUp={onScenePointerUp}
-        onPointerLeave={onScenePointerUp}
       >
         <ZoneLines show={t.showZoneLines} zones={dynamicZones} />
         {companies.map((c) => {
