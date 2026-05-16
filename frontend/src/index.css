@@ -338,5 +338,5 @@ html, body {
   .chips::-webkit-scrollbar { display: none; }
   .topbar-row:last-child { gap: 0; }
 
-  .panel { width: 100%; border-left: none; border-top: 1px solid var(--line-strong); top: auto; }
+  .panel { width: 100%; border-left: none; border-top: 1px solid var(--line-strong); }
 }

@@ -42,6 +42,7 @@ export function DetailPanel({ company, quote, onClose }) {
       setShown(company);
       setNews([]);
       setNewsLoading(true);
+      if (panelRef.current) panelRef.current.scrollTop = 0;
       api.company(company.ticker)
         .then((data) => setNews(data.news ?? []))
         .catch(() => {})
