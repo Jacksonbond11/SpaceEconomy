@@ -11,7 +11,7 @@ public class Company
     public double X { get; set; }
     public double? YOffset { get; set; }
     public string Icon { get; set; } = null!;
-    public string Desc { get; set; } = null!;
+    public string? Desc { get; set; }
     public int? Founded { get; set; }
     public string? Hq { get; set; }
 

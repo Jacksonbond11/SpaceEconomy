@@ -99,7 +99,13 @@ record TickerDetailsResponse(
 
 public record PolygonTickerDetails(
     [property: JsonPropertyName("ticker")] string Ticker,
-    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("name")] string? Name,
     [property: JsonPropertyName("market_cap")] decimal? MarketCap,
     [property: JsonPropertyName("description")] string? Description,
-    [property: JsonPropertyName("homepage_url")] string? HomepageUrl);
+    [property: JsonPropertyName("homepage_url")] string? HomepageUrl,
+    [property: JsonPropertyName("address")] PolygonAddress? Address,
+    [property: JsonPropertyName("list_date")] string? ListDate);
+
+public record PolygonAddress(
+    [property: JsonPropertyName("city")] string? City,
+    [property: JsonPropertyName("state")] string? State);

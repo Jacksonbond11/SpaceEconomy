@@ -12,6 +12,7 @@ public class MarketDataRefreshService(
     {
         await Task.Delay(TimeSpan.FromSeconds(5), ct);
 
+        await RefreshCompanyDetailsAsync(ct);
         await RefreshQuotesAsync(ct);
         await RefreshNewsAsync(ct);
 
@@ -24,6 +25,41 @@ public class MarketDataRefreshService(
             if (cycle % 12 == 0)
                 await RefreshNewsAsync(ct);
         }
+    }
+
+    private async Task RefreshCompanyDetailsAsync(CancellationToken ct)
+    {
+        using var scope = scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var polygon = scope.ServiceProvider.GetRequiredService<PolygonService>();
+
+        var companies = await db.Companies
+            .Where(c => c.Exchange != "—")
+            .ToListAsync(ct);
+
+        foreach (var company in companies)
+        {
+            try
+            {
+                var details = await polygon.GetTickerDetailsAsync(company.Ticker, ct);
+                if (details is null) continue;
+
+                if (!string.IsNullOrWhiteSpace(details.Name))
+                    company.Name = details.Name;
+                if (!string.IsNullOrWhiteSpace(details.Description))
+                    company.Desc = details.Description;
+                if (details.Address is { City: not null, State: not null })
+                    company.Hq = $"{details.Address.City}, {details.Address.State}";
+
+                await db.SaveChangesAsync(ct);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                logger.LogWarning(ex, "Details fetch failed for {Ticker}", company.Ticker);
+            }
+        }
+
+        logger.LogInformation("Company details refreshed for {Count} tickers", companies.Count);
     }
 
     private async Task RefreshQuotesAsync(CancellationToken ct)
