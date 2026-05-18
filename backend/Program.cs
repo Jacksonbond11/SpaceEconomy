@@ -7,7 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<PolygonService>();
+builder.Services.AddHttpClient<FmpService>();
 builder.Services.AddHostedService<MarketDataRefreshService>();
 
 builder.Services.AddControllers();
