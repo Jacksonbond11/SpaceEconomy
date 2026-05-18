@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="40%" r="80%">
+      <stop offset="0%" stop-color="#130d2e"/>
+      <stop offset="100%" stop-color="#04030d"/>
+    </radialGradient>
+    <radialGradient id="planet-fill" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="60%" stop-color="#6d28d9"/>
+      <stop offset="100%" stop-color="#2e1065"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7e14ff" stop-opacity=".35"/>
+      <stop offset="100%" stop-color="#7e14ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur-glow">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="star-blur">
+      <feGaussianBlur stdDeviation="0.5"/>
+    </filter>
+    <clipPath id="planet-clip">
+      <circle cx="920" cy="315" r="200"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Star field -->
+  <g opacity=".7" filter="url(#star-blur)">
+    <circle cx="42" cy="38" r="1.2" fill="#fff" opacity=".8"/>
+    <circle cx="118" cy="92" r=".8" fill="#fff" opacity=".6"/>
+    <circle cx="203" cy="17" r="1" fill="#fff" opacity=".9"/>
+    <circle cx="341" cy="55" r=".7" fill="#fff" opacity=".5"/>
+    <circle cx="487" cy="28" r="1.1" fill="#fff" opacity=".7"/>
+    <circle cx="563" cy="73" r=".8" fill="#fff" opacity=".6"/>
+    <circle cx="672" cy="14" r="1" fill="#fff" opacity=".8"/>
+    <circle cx="789" cy="47" r=".7" fill="#fff" opacity=".5"/>
+    <circle cx="876" cy="22" r="1.2" fill="#fff" opacity=".7"/>
+    <circle cx="981" cy="61" r=".8" fill="#fff" opacity=".6"/>
+    <circle cx="1063" cy="33" r="1" fill="#fff" opacity=".8"/>
+    <circle cx="1142" cy="88" r=".7" fill="#fff" opacity=".5"/>
+    <circle cx="74" cy="158" r="1" fill="#fff" opacity=".6"/>
+    <circle cx="167" cy="204" r=".8" fill="#fff" opacity=".7"/>
+    <circle cx="298" cy="171" r="1.1" fill="#fff" opacity=".5"/>
+    <circle cx="412" cy="143" r=".7" fill="#fff" opacity=".8"/>
+    <circle cx="534" cy="187" r="1" fill="#fff" opacity=".6"/>
+    <circle cx="618" cy="126" r=".8" fill="#fff" opacity=".7"/>
+    <circle cx="743" cy="164" r=".7" fill="#fff" opacity=".5"/>
+    <circle cx="856" cy="139" r="1.2" fill="#fff" opacity=".8"/>
+    <circle cx="958" cy="193" r=".8" fill="#fff" opacity=".6"/>
+    <circle cx="1087" cy="148" r="1" fill="#fff" opacity=".7"/>
+    <circle cx="1178" cy="177" r=".7" fill="#fff" opacity=".5"/>
+    <circle cx="31" cy="287" r=".8" fill="#fff" opacity=".7"/>
+    <circle cx="156" cy="318" r="1.1" fill="#fff" opacity=".5"/>
+    <circle cx="247" cy="272" r=".7" fill="#fff" opacity=".8"/>
+    <circle cx="389" cy="304" r="1" fill="#fff" opacity=".6"/>
+    <circle cx="498" cy="261" r=".8" fill="#fff" opacity=".7"/>
+    <circle cx="87" cy="412" r="1" fill="#fff" opacity=".6"/>
+    <circle cx="193" cy="448" r=".7" fill="#fff" opacity=".5"/>
+    <circle cx="312" cy="387" r="1.2" fill="#fff" opacity=".8"/>
+    <circle cx="445" cy="423" r=".8" fill="#fff" opacity=".6"/>
+    <circle cx="567" cy="468" r="1" fill="#fff" opacity=".7"/>
+    <circle cx="98" cy="548" r=".7" fill="#fff" opacity=".5"/>
+    <circle cx="214" cy="574" r="1" fill="#fff" opacity=".8"/>
+    <circle cx="347" cy="531" r=".8" fill="#fff" opacity=".6"/>
+    <circle cx="463" cy="563" r="1.1" fill="#fff" opacity=".7"/>
+    <circle cx="589" cy="512" r=".7" fill="#fff" opacity=".5"/>
+    <circle cx="1098" cy="287" r=".8" fill="#fff" opacity=".7"/>
+    <circle cx="1167" cy="341" r="1" fill="#fff" opacity=".6"/>
+    <circle cx="1034" cy="392" r=".7" fill="#fff" opacity=".5"/>
+    <circle cx="1143" cy="448" r="1.1" fill="#fff" opacity=".8"/>
+    <circle cx="1052" cy="512" r=".8" fill="#fff" opacity=".6"/>
+    <circle cx="1176" cy="531" r="1" fill="#fff" opacity=".7"/>
+  </g>
+
+  <!-- Planet ambient glow -->
+  <circle cx="920" cy="315" r="260" fill="url(#glow)"/>
+
+  <!-- Planet ring (back) -->
+  <ellipse cx="920" cy="315" rx="310" ry="62" fill="none" stroke="#7e14ff" stroke-width="14" opacity=".22"/>
+  <ellipse cx="920" cy="315" rx="280" ry="54" fill="none" stroke="#a855f7" stroke-width="6" opacity=".18"/>
+  <ellipse cx="920" cy="315" rx="250" ry="46" fill="none" stroke="#c4b5fd" stroke-width="3" opacity=".14"/>
+
+  <!-- Planet body -->
+  <circle cx="920" cy="315" r="200" fill="url(#planet-fill)"/>
+
+  <!-- Planet surface bands -->
+  <g clip-path="url(#planet-clip)">
+    <ellipse cx="920" cy="230" rx="200" ry="28" fill="#7c3aed" opacity=".3"/>
+    <ellipse cx="920" cy="290" rx="200" ry="20" fill="#6d28d9" opacity=".2"/>
+    <ellipse cx="920" cy="355" rx="200" ry="24" fill="#4c1d95" opacity=".25"/>
+    <ellipse cx="920" cy="410" rx="200" ry="18" fill="#3b0764" opacity=".2"/>
+    <!-- Planet highlight -->
+    <circle cx="860" cy="245" r="90" fill="#c4b5fd" opacity=".07"/>
+    <circle cx="850" cy="238" r="45" fill="#ede6ff" opacity=".06"/>
+  </g>
+
+  <!-- Planet ring (front, above planet center) -->
+  <ellipse cx="920" cy="315" rx="310" ry="62" fill="none" stroke="#7e14ff" stroke-width="14" opacity=".22" clip-path="url(#ring-front)" style="clip-path:inset(0 0 50% 0)"/>
+  <ellipse cx="920" cy="315" rx="280" ry="54" fill="none" stroke="#a855f7" stroke-width="6" opacity=".28" style="clip-path:inset(0 0 50% 0)"/>
+  <ellipse cx="920" cy="315" rx="250" ry="46" fill="none" stroke="#c4b5fd" stroke-width="3" opacity=".22" style="clip-path:inset(0 0 50% 0)"/>
+
+  <!-- Rocket (left side, tilted ~15° right) -->
+  <g transform="translate(160, 135) rotate(8)">
+    <!-- Exhaust glow -->
+    <ellipse cx="0" cy="295" rx="28" ry="16" fill="#47bfff" opacity=".2"/>
+    <!-- Flame -->
+    <path d="M-22 270 Q-8 320 0 305 Q8 320 22 270 Z" fill="#47bfff" opacity=".65"/>
+    <path d="M-13 270 Q-5 308 0 298 Q5 308 13 270 Z" fill="#c0f0ff" opacity=".85"/>
+    <path d="M-7 270 Q0 295 7 270 Z" fill="#fff" opacity=".6"/>
+    <!-- Body -->
+    <path d="M0 20 L-42 270 L42 270 Z" fill="#863bff"/>
+    <!-- Body highlight -->
+    <path d="M0 20 L-42 270 L0 252 Z" fill="#a855f7"/>
+    <!-- Nose glow -->
+    <circle cx="0" cy="26" r="14" fill="#c4b5fd" opacity=".2"/>
+    <!-- Porthole -->
+    <circle cx="0" cy="148" r="24" fill="none" stroke="#ede6ff" stroke-width="3" opacity=".5"/>
+    <circle cx="0" cy="148" r="15" fill="#c4b5fd" opacity=".35"/>
+    <circle cx="0" cy="148" r="8" fill="#ede6ff" opacity=".5"/>
+    <circle cx="-5" cy="143" r="4" fill="#fff" opacity=".5"/>
+    <!-- Second porthole (smaller) -->
+    <circle cx="0" cy="208" r="14" fill="none" stroke="#ede6ff" stroke-width="2" opacity=".3"/>
+    <circle cx="0" cy="208" r="8" fill="#c4b5fd" opacity=".2"/>
+    <!-- Left fin -->
+    <path d="M-42 270 L-72 340 L-28 295 Z" fill="#5b21b6"/>
+    <!-- Right fin -->
+    <path d="M42 270 L72 340 L28 295 Z" fill="#5b21b6"/>
+    <!-- Side boosters -->
+    <rect x="-58" y="195" width="16" height="65" rx="8" fill="#6d28d9"/>
+    <rect x="42" y="195" width="16" height="65" rx="8" fill="#6d28d9"/>
+  </g>
+
+  <!-- Text area -->
+  <!-- Brand mark (small rocket icon echo) -->
+  <g transform="translate(320, 208) scale(1.1)">
+    <rect width="44" height="44" rx="10" fill="#863bff" opacity=".15"/>
+    <rect width="44" height="44" rx="10" fill="none" stroke="#a855f7" stroke-width="1" opacity=".3"/>
+    <path d="M22 6 L14 36 L22 33 L30 36 Z" fill="#863bff"/>
+    <path d="M22 6 L14 36 L22 33 Z" fill="#a855f7"/>
+    <circle cx="22" cy="21" r="4" fill="none" stroke="#ede6ff" stroke-width="1.2" opacity=".6"/>
+    <circle cx="22" cy="21" r="2" fill="#c4b5fd" opacity=".7"/>
+    <path d="M14 36 L10 43 L18 39 Z" fill="#5b21b6"/>
+    <path d="M30 36 L34 43 L26 39 Z" fill="#5b21b6"/>
+  </g>
+
+  <!-- Site title -->
+  <text x="380" y="262" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="82" font-weight="700" letter-spacing="-2" fill="#ffffff">Space Economy</text>
+
+  <!-- Subtitle -->
+  <text x="382" y="318" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="24" font-weight="400" letter-spacing="4" fill="#a855f7" text-transform="uppercase">ORBITAL MAP · SPACE MARKETS</text>
+
+  <!-- Divider -->
+  <line x1="382" y1="345" x2="820" y2="345" stroke="#863bff" stroke-width="1" opacity=".4"/>
+
+  <!-- Description -->
+  <text x="382" y="385" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="300" fill="#c4b5fd" opacity=".8">Track publicly traded space industry companies</text>
+  <text x="382" y="416" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="300" fill="#c4b5fd" opacity=".8">across launch, satellite, defense, and beyond.</text>
+
+  <!-- Bottom accent dots -->
+  <circle cx="382" cy="468" r="4" fill="#863bff" opacity=".7"/>
+  <circle cx="398" cy="468" r="4" fill="#47bfff" opacity=".5"/>
+  <circle cx="414" cy="468" r="4" fill="#a855f7" opacity=".4"/>
+</svg>
