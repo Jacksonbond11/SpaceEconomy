@@ -21,6 +21,17 @@ const fmtChange = (pct) => {
   const sign = pct >= 0 ? "+" : "";
   return { text: `${sign}${Number(pct).toFixed(2)}%`, positive: pct >= 0 };
 };
+const fmtBig = (n) => {
+  if (n == null) return "—";
+  const v = Number(n);
+  const abs = Math.abs(v);
+  const sign = v < 0 ? "-" : "";
+  if (abs >= 1e9) return `${sign}$${(abs / 1e9).toFixed(2)}B`;
+  if (abs >= 1e6) return `${sign}$${(abs / 1e6).toFixed(1)}M`;
+  if (abs >= 1e3) return `${sign}$${(abs / 1e3).toFixed(0)}K`;
+  return `${sign}$${abs.toLocaleString()}`;
+};
+const fmtPct = (r) => (r == null ? "—" : `${(Number(r) * 100).toFixed(1)}%`);
 const zoneLabelOf = (zoneId) => ZONES.find((z) => z.id === zoneId)?.label ?? zoneId;
 const relativeTime = (iso) => {
   const ms = Date.now() - new Date(iso).getTime();
@@ -34,6 +45,8 @@ export function DetailPanel({ company, quote, onClose }) {
   const [shown, setShown] = useState(null);
   const [news, setNews] = useState([]);
   const [newsLoading, setNewsLoading] = useState(false);
+  const [financials, setFinancials] = useState(null);
+  const [executives, setExecutives] = useState([]);
   const panelRef = useRef(null);
   const swipeRef = useRef(null);
 
@@ -41,10 +54,16 @@ export function DetailPanel({ company, quote, onClose }) {
     if (company) {
       setShown(company);
       setNews([]);
+      setFinancials(null);
+      setExecutives([]);
       setNewsLoading(true);
       if (panelRef.current) panelRef.current.scrollTop = 0;
       api.company(company.ticker)
-        .then((data) => setNews(data.news ?? []))
+        .then((data) => {
+          setNews(data.news ?? []);
+          setFinancials(data.financials ?? null);
+          setExecutives(data.executives ?? []);
+        })
         .catch(() => {})
         .finally(() => setNewsLoading(false));
     } else {
@@ -87,6 +106,7 @@ export function DetailPanel({ company, quote, onClose }) {
     : Math.max(2, Math.min(100, (Math.log10(Math.max(1, c.altKm)) / Math.log10(maxKm)) * 100));
 
   const change = fmtChange(quote?.changePct);
+  const fyLabel = financials?.date ? ` · FY${financials.date.substring(0, 4)}` : "";
 
   return (
     <aside ref={panelRef} className={`panel ${open ? "open" : ""}`} aria-hidden={!open}>
@@ -174,6 +194,58 @@ export function DetailPanel({ company, quote, onClose }) {
               </div>
             </div>
           </div>
+
+          {financials && (
+            <div className="panel-section">
+              <h3>{`Financials${fyLabel}`}</h3>
+              <div className="stat-grid">
+                <div className="stat">
+                  <div className="k">Revenue</div>
+                  <div className="v">{fmtBig(financials.revenue)}</div>
+                </div>
+                <div className="stat">
+                  <div className="k">Cost of Revenue</div>
+                  <div className="v">{fmtBig(financials.costOfRevenue)}</div>
+                </div>
+                <div className="stat">
+                  <div className="k">Gross Margin</div>
+                  <div className="v">{fmtPct(financials.grossProfitRatio)}</div>
+                </div>
+                <div className="stat">
+                  <div className="k">Operating Exp.</div>
+                  <div className="v">{fmtBig(financials.operatingExpenses)}</div>
+                </div>
+                <div className="stat">
+                  <div className="k">Net Income</div>
+                  <div className="v" style={{
+                    color: financials.netIncome == null
+                      ? undefined
+                      : financials.netIncome >= 0 ? "var(--good)" : "var(--warn)"
+                  }}>
+                    {fmtBig(financials.netIncome)}
+                  </div>
+                </div>
+                <div className="stat">
+                  <div className="k">Net Margin</div>
+                  <div className="v">{fmtPct(financials.netIncomeRatio)}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {executives.length > 0 && (
+            <div className="panel-section">
+              <h3>Leadership</h3>
+              <div className="exec-list">
+                {executives.slice(0, 8).map((e, i) => (
+                  <div key={i} className="exec-row">
+                    <div className="exec-name">{e.name}</div>
+                    <div className="exec-title">{e.title}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="panel-section">
             <h3>News</h3>

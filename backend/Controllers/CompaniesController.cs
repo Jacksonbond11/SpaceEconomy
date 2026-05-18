@@ -1,5 +1,6 @@
 using SpaceEconomy.Api.Data;
 using SpaceEconomy.Api.Models;
+using SpaceEconomy.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +8,7 @@ namespace SpaceEconomy.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CompaniesController(AppDbContext db) : ControllerBase
+public class CompaniesController(AppDbContext db, FmpService fmp) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -23,17 +24,31 @@ public class CompaniesController(AppDbContext db) : ControllerBase
     [HttpGet("{ticker}")]
     public async Task<IActionResult> Get(string ticker)
     {
+        var upper = ticker.ToUpper();
+
         var company = await db.Companies
             .Include(c => c.Quote)
-            .FirstOrDefaultAsync(c => c.Ticker == ticker.ToUpper());
+            .FirstOrDefaultAsync(c => c.Ticker == upper);
 
         if (company is null) return NotFound();
 
         var news = await db.NewsArticles
-            .Where(n => n.Tickers.Any(t => t == ticker.ToUpper()))
+            .Where(n => n.Tickers.Any(t => t == upper))
             .OrderByDescending(n => n.PublishedUtc)
             .Take(8)
             .ToListAsync();
+
+        FmpIncomeStatement? financials = null;
+        IReadOnlyList<FmpExecutive> executives = [];
+
+        if (company.Exchange != "—")
+        {
+            try { financials = await fmp.GetIncomeStatementAsync(upper); }
+            catch (Exception ex) when (ex is not OperationCanceledException) { }
+
+            try { executives = await fmp.GetExecutivesAsync(upper); }
+            catch (Exception ex) when (ex is not OperationCanceledException) { }
+        }
 
         return Ok(new
         {
@@ -43,6 +58,21 @@ public class CompaniesController(AppDbContext db) : ControllerBase
                 n.Id, n.Title, n.Description, n.ArticleUrl,
                 n.ImageUrl, n.Author, n.Publisher, n.PublishedUtc,
             }),
+            financials = financials is null ? null : new
+            {
+                financials.Date,
+                financials.Revenue,
+                financials.CostOfRevenue,
+                financials.GrossProfit,
+                financials.GrossProfitRatio,
+                financials.OperatingExpenses,
+                financials.OperatingIncome,
+                financials.NetIncome,
+                financials.NetIncomeRatio,
+            },
+            executives = executives
+                .Where(e => e.Name is not null && e.Title is not null)
+                .Select(e => new { e.Name, e.Title }),
         });
     }
 
