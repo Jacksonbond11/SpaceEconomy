@@ -238,7 +238,7 @@ export function App() {
             <div className="brand-mark" />
             <div>
               <h1 className="brand-title">Space Economy</h1>
-              <div className="brand-sub mono">Space Markets · Orbital Map</div>
+              <div className="brand-sub mono">Orbital Map</div>
             </div>
           </div>
 
