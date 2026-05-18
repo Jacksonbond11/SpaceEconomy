@@ -111,7 +111,7 @@ html, body {
   background: radial-gradient(circle at 35% 35%, #7dd3fc, #1d4a7a 60%, #0b1f3e);
   box-shadow: 0 0 14px rgba(125,211,252,0.4);
 }
-.brand-title { font-weight: 600; letter-spacing: 0.04em; font-size: 15px; white-space: nowrap; }
+.brand-title { font-weight: 600; letter-spacing: 0.04em; font-size: 15px; white-space: nowrap; margin: 0; }
 .brand-sub {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px; letter-spacing: 0.2em;
