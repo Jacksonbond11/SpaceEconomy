@@ -192,7 +192,7 @@ export function DetailPanel({ company, quote, onClose }) {
                     className="news-item"
                   >
                     {article.imageUrl && (
-                      <img className="news-thumb" src={article.imageUrl} alt="" loading="lazy" />
+                      <img className="news-thumb" src={article.imageUrl} alt={article.title} loading="lazy" />
                     )}
                     <div className="news-body">
                       <div className="news-title">{article.title}</div>
