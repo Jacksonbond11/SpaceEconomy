@@ -8,7 +8,7 @@ namespace SpaceEconomy.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CompaniesController(AppDbContext db, FmpService fmp) : ControllerBase
+public class CompaniesController(AppDbContext db, AlphaVantageService av) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -38,17 +38,21 @@ public class CompaniesController(AppDbContext db, FmpService fmp) : ControllerBa
             .Take(8)
             .ToListAsync();
 
-        FmpIncomeStatement? financials = null;
-        IReadOnlyList<FmpExecutive> executives = [];
+        AvIncomeReport? income = null;
+        AvOverview? overview = null;
 
         if (company.Exchange != "—")
         {
-            try { financials = await fmp.GetIncomeStatementAsync(upper); }
+            try { income = await av.GetIncomeStatementAsync(upper); }
             catch (Exception ex) when (ex is not OperationCanceledException) { }
 
-            try { executives = await fmp.GetExecutivesAsync(upper); }
+            try { overview = await av.GetOverviewAsync(upper); }
             catch (Exception ex) when (ex is not OperationCanceledException) { }
         }
+
+        var revenue = AlphaVantageService.ParseDecimal(income?.TotalRevenue);
+        var grossProfit = AlphaVantageService.ParseDecimal(income?.GrossProfit);
+        var netIncome = AlphaVantageService.ParseDecimal(income?.NetIncome);
 
         return Ok(new
         {
@@ -58,24 +62,28 @@ public class CompaniesController(AppDbContext db, FmpService fmp) : ControllerBa
                 n.Id, n.Title, n.Description, n.ArticleUrl,
                 n.ImageUrl, n.Author, n.Publisher, n.PublishedUtc,
             }),
-            financials = financials is null ? null : new
+            financials = income is null ? null : new
             {
-                financials.Date,
-                financials.Revenue,
-                financials.CostOfRevenue,
-                GrossProfitRatio = financials.Revenue > 0
-                    ? financials.GrossProfit / financials.Revenue
-                    : (decimal?)null,
-                financials.OperatingExpenses,
-                financials.OperatingIncome,
-                financials.NetIncome,
-                NetIncomeRatio = financials.Revenue > 0
-                    ? financials.NetIncome / financials.Revenue
-                    : (decimal?)null,
+                Date = income.FiscalDateEnding,
+                Revenue = revenue,
+                CostOfRevenue = AlphaVantageService.ParseDecimal(income.CostOfRevenue),
+                GrossProfitRatio = revenue > 0 ? grossProfit / revenue : (decimal?)null,
+                OperatingExpenses = AlphaVantageService.ParseDecimal(income.OperatingExpenses),
+                NetIncome = netIncome,
+                NetIncomeRatio = revenue > 0 ? netIncome / revenue : (decimal?)null,
             },
-            executives = executives
-                .Where(e => e.Name is not null && e.Title is not null)
-                .Select(e => new { e.Name, e.Title }),
+            companyOverview = overview is null ? null : new
+            {
+                Sector = AlphaVantageService.NoneToNull(overview.Sector),
+                Industry = AlphaVantageService.NoneToNull(overview.Industry),
+                Country = AlphaVantageService.NoneToNull(overview.Country),
+                OfficialSite = AlphaVantageService.NoneToNull(overview.OfficialSite),
+                FiscalYearEnd = AlphaVantageService.NoneToNull(overview.FiscalYearEnd),
+                PeRatio = AlphaVantageService.ParseDecimal(overview.PeRatio),
+                Eps = AlphaVantageService.ParseDecimal(overview.Eps),
+                Beta = AlphaVantageService.ParseDecimal(overview.Beta),
+                AnalystTargetPrice = AlphaVantageService.ParseDecimal(overview.AnalystTargetPrice),
+            },
         });
     }
 

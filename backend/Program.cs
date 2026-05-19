@@ -9,7 +9,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<PolygonService>();
-builder.Services.AddHttpClient<FmpService>();
+builder.Services.AddHttpClient<AlphaVantageService>();
 builder.Services.AddHostedService<MarketDataRefreshService>();
 
 builder.Services.AddControllers();

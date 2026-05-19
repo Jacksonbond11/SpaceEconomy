@@ -297,11 +297,8 @@ html, body {
 .orbit-bar::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: var(--p, 50%); background: linear-gradient(90deg, var(--accent), #b6e9ff); border-radius: 2px; }
 .orbit-alt { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink); min-width: 90px; text-align: right; }
 
-/* exec list */
-.exec-list { display: flex; flex-direction: column; gap: 10px; }
-.exec-row { display: flex; flex-direction: column; gap: 2px; }
-.exec-name { font-size: 13px; font-weight: 500; color: var(--ink); }
-.exec-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint); }
+.company-link { display: inline-block; margin-top: 12px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--accent); text-decoration: none; letter-spacing: 0.04em; }
+.company-link:hover { text-decoration: underline; }
 
 /* news */
 .news-list { display: flex; flex-direction: column; gap: 10px; }

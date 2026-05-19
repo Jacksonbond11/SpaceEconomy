@@ -46,7 +46,7 @@ export function DetailPanel({ company, quote, onClose }) {
   const [news, setNews] = useState([]);
   const [newsLoading, setNewsLoading] = useState(false);
   const [financials, setFinancials] = useState(null);
-  const [executives, setExecutives] = useState([]);
+  const [companyOverview, setCompanyOverview] = useState(null);
   const panelRef = useRef(null);
   const swipeRef = useRef(null);
   const onCloseRef = useRef(onClose);
@@ -113,14 +113,14 @@ export function DetailPanel({ company, quote, onClose }) {
       setShown(company);
       setNews([]);
       setFinancials(null);
-      setExecutives([]);
+      setCompanyOverview(null);
       setNewsLoading(true);
       if (panelRef.current) panelRef.current.scrollTop = 0;
       api.company(company.ticker)
         .then((data) => {
           setNews(data.news ?? []);
           setFinancials(data.financials ?? null);
-          setExecutives(data.executives ?? []);
+          setCompanyOverview(data.companyOverview ?? null);
         })
         .catch(() => {})
         .finally(() => setNewsLoading(false));
@@ -291,17 +291,71 @@ export function DetailPanel({ company, quote, onClose }) {
             </div>
           )}
 
-          {executives.length > 0 && (
+          {companyOverview && (
             <div className="panel-section">
-              <h3>Leadership</h3>
-              <div className="exec-list">
-                {executives.slice(0, 8).map((e, i) => (
-                  <div key={i} className="exec-row">
-                    <div className="exec-name">{e.name}</div>
-                    <div className="exec-title">{e.title}</div>
+              <h3>Overview</h3>
+              <div className="stat-grid">
+                {companyOverview.sector && (
+                  <div className="stat">
+                    <div className="k">Sector</div>
+                    <div className="v" style={{ fontSize: 11 }}>{companyOverview.sector}</div>
                   </div>
-                ))}
+                )}
+                {companyOverview.industry && (
+                  <div className="stat">
+                    <div className="k">Industry</div>
+                    <div className="v" style={{ fontSize: 10 }}>{companyOverview.industry}</div>
+                  </div>
+                )}
+                {companyOverview.country && (
+                  <div className="stat">
+                    <div className="k">Country</div>
+                    <div className="v">{companyOverview.country}</div>
+                  </div>
+                )}
+                {companyOverview.fiscalYearEnd && (
+                  <div className="stat">
+                    <div className="k">Fiscal Year</div>
+                    <div className="v">{companyOverview.fiscalYearEnd}</div>
+                  </div>
+                )}
+                {companyOverview.eps != null && (
+                  <div className="stat">
+                    <div className="k">EPS</div>
+                    <div className="v" style={{ color: companyOverview.eps >= 0 ? "var(--good)" : "var(--warn)" }}>
+                      {companyOverview.eps.toFixed(2)}
+                    </div>
+                  </div>
+                )}
+                {companyOverview.peRatio != null && (
+                  <div className="stat">
+                    <div className="k">P/E Ratio</div>
+                    <div className="v">{companyOverview.peRatio.toFixed(1)}</div>
+                  </div>
+                )}
+                {companyOverview.beta != null && (
+                  <div className="stat">
+                    <div className="k">Beta</div>
+                    <div className="v">{companyOverview.beta.toFixed(2)}</div>
+                  </div>
+                )}
+                {companyOverview.analystTargetPrice != null && (
+                  <div className="stat">
+                    <div className="k">Analyst Target</div>
+                    <div className="v" style={{ color: "var(--accent)" }}>${companyOverview.analystTargetPrice.toFixed(2)}</div>
+                  </div>
+                )}
               </div>
+              {companyOverview.officialSite && (
+                <a
+                  href={companyOverview.officialSite}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="company-link"
+                >
+                  {companyOverview.officialSite.replace(/^https?:\/\//, "")}
+                </a>
+              )}
             </div>
           )}
 
