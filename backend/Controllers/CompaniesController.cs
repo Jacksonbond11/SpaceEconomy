@@ -63,12 +63,15 @@ public class CompaniesController(AppDbContext db, FmpService fmp) : ControllerBa
                 financials.Date,
                 financials.Revenue,
                 financials.CostOfRevenue,
-                financials.GrossProfit,
-                financials.GrossProfitRatio,
+                GrossProfitRatio = financials.Revenue > 0
+                    ? financials.GrossProfit / financials.Revenue
+                    : (decimal?)null,
                 financials.OperatingExpenses,
                 financials.OperatingIncome,
                 financials.NetIncome,
-                financials.NetIncomeRatio,
+                NetIncomeRatio = financials.Revenue > 0
+                    ? financials.NetIncome / financials.Revenue
+                    : (decimal?)null,
             },
             executives = executives
                 .Where(e => e.Name is not null && e.Title is not null)
