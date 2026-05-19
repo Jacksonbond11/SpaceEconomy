@@ -49,6 +49,64 @@ export function DetailPanel({ company, quote, onClose }) {
   const [executives, setExecutives] = useState([]);
   const panelRef = useRef(null);
   const swipeRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; });
+
+  // Full-panel swipe-to-close (right swipe anywhere except the handle strip)
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    let startX = 0, startY = 0, dir = null; // dir: null | 'h' | 'v' | 'skip'
+
+    const onTouchStart = (e) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+      startY = t.clientY;
+      // Let existing handle pointer-events own touches that begin on the handle
+      dir = e.target.closest('.panel-handle') ? 'skip' : null;
+    };
+
+    const onTouchMove = (e) => {
+      if (dir === 'skip' || dir === 'v') return;
+      const t = e.touches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      if (dir === null) {
+        if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+        dir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+        if (dir === 'v') return;
+      }
+      const clampedDx = Math.max(0, dx);
+      e.preventDefault();
+      el.style.transform = `translateX(${clampedDx}px)`;
+      el.style.transition = 'none';
+    };
+
+    const onTouchEnd = (e) => {
+      if (dir !== 'h') { dir = null; return; }
+      const dx = e.changedTouches[0].clientX - startX;
+      el.style.transform = '';
+      el.style.transition = '';
+      dir = null;
+      if (dx > 80) onCloseRef.current();
+    };
+
+    const onTouchCancel = () => {
+      if (dir === 'h') { el.style.transform = ''; el.style.transition = ''; }
+      dir = null;
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    el.addEventListener('touchcancel', onTouchCancel, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('touchcancel', onTouchCancel);
+    };
+  }, []);
 
   useEffect(() => {
     if (company) {
